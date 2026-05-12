@@ -22,13 +22,12 @@
             color: #ffffff;
         }
 
-        /* Khung Đăng ký vuông vắn, góc cạnh */
         .glass-card {
             background: rgba(20, 20, 20, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(229, 9, 20, 0.3);
-            border-radius: 4px; /* ÉP VUÔNG VẮN */
+            border-radius: 4px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(229, 9, 20, 0.1);
             width: 450px;
             overflow-y: auto;
@@ -37,23 +36,17 @@
 
         .card-header {
             background: rgba(0, 0, 0, 0.5);
-            border-bottom: 2px solid #e50914; /* Vạch đỏ CGV */
+            border-bottom: 2px solid #e50914;
             padding: 20px 0;
         }
 
-        /* Ô nhập liệu vuông vắn */
         .form-control {
             background: rgba(0, 0, 0, 0.4) !important;
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff !important;
-            border-radius: 4px; /* ÉP VUÔNG VẮN */
+            border-radius: 4px;
             padding: 10px 15px;
             transition: all 0.3s;
-        }
-
-        .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-            font-size: 0.85rem;
         }
 
         .form-control:focus {
@@ -62,7 +55,6 @@
             outline: none;
         }
 
-        /* Nút bấm vuông vắn */
         .btn-cinema {
             background: #e50914;
             border: none;
@@ -112,7 +104,9 @@
                     <i class="bi bi-person-vcard text-warning me-1"></i> HỌ VÀ TÊN
                 </label>
                 <input type="text" class="form-control" th:field="*{fullName}" th:errorclass="border-danger" placeholder="Ví dụ: Nguyễn Văn A">
-                <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="text-danger-glow mt-1"></div>
+                <div th:if="${#fields.hasErrors('fullName')}"
+                     th:text="${#fields.errors('fullName')[0]}"
+                     class="text-danger-glow mt-1"></div>
             </div>
 
             <div class="mb-3">
@@ -120,7 +114,12 @@
                     <i class="bi bi-envelope-at-fill text-warning me-1"></i> EMAIL ĐĂNG NHẬP
                 </label>
                 <input type="text" class="form-control" th:field="*{email}" th:errorclass="border-danger" placeholder="example@gmail.com">
-                <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger-glow mt-1"></div>
+                <div th:if="${#fields.hasErrors('email')}" class="text-danger-glow mt-1">
+                    <span th:each="err : ${#fields.errors('email')}"
+                          th:if="${err.contains('trống')}" th:text="${err}"></span>
+                    <span th:if="${!#strings.contains(#fields.errors('email'), 'trống')}"
+                          th:text="${#fields.errors('email')[0]}"></span>
+                </div>
             </div>
 
             <div class="mb-3">
@@ -128,7 +127,12 @@
                     <i class="bi bi-telephone-fill text-warning me-1"></i> SỐ ĐIỆN THOẠI
                 </label>
                 <input type="text" class="form-control" th:field="*{phone}" th:errorclass="border-danger" placeholder="09xxxxxxxx">
-                <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="text-danger-glow mt-1"></div>
+                <div th:if="${#fields.hasErrors('phone')}" class="text-danger-glow mt-1">
+                    <span th:each="err : ${#fields.errors('phone')}"
+                          th:if="${err.contains('trống')}" th:text="${err}"></span>
+                    <span th:if="${!#strings.contains(#fields.errors('phone'), 'trống')}"
+                          th:text="${#fields.errors('phone')[0]}"></span>
+                </div>
             </div>
 
             <div class="mb-4">
@@ -136,7 +140,9 @@
                     <i class="bi bi-key-fill text-warning me-1"></i> MẬT KHẨU
                 </label>
                 <input type="password" class="form-control" th:field="*{password}" th:errorclass="border-danger" placeholder="Tối thiểu 6 ký tự">
-                <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-danger-glow mt-1"></div>
+                <div th:if="${#fields.hasErrors('password')}"
+                     th:text="${#fields.errors('password')[0]}"
+                     class="text-danger-glow mt-1"></div>
             </div>
 
             <button type="submit" class="btn btn-cinema btn-lg w-100 fw-bold text-uppercase fs-6 py-3 mt-2">
