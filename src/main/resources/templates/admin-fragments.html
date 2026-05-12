@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style th:fragment="admin-css">
+        /* Reset cơ bản cho Dark Mode */
+        body { display: flex; min-height: 100vh; overflow-x: hidden; background-color: #050505 !important; color: #eaeaea; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        /* Cấu hình Sidebar (Menu trái) */
+        .sidebar { width: 260px; background-color: #0a0a0a; color: #fff; display: flex; flex-direction: column; border-right: 1px solid #222; z-index: 100; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid #222; background: linear-gradient(180deg, #111 0%, #0a0a0a 100%); }
+        .sidebar-menu { flex-grow: 1; padding: 0; margin: 0; list-style: none; }
+
+        /* Cấu hình các nút Link trong Menu */
+        .sidebar-menu li a { display: block; padding: 16px 20px; color: #adb5bd; text-decoration: none; border-bottom: 1px solid #1a1a1a; transition: all 0.3s ease; letter-spacing: 0.5px; }
+
+        /* HIỆU ỨNG NEON KHI HOVER / ACTIVE */
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background-color: rgba(229, 9, 20, 0.1);
+            color: #fff;
+            font-weight: bold;
+            border-left: 4px solid #e50914;
+            box-shadow: inset 10px 0 15px rgba(229, 9, 20, 0.05);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Cấu hình Khu vực nội dung chính & Topbar */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; background-color: #050505; }
+        .top-navbar { background-color: #0a0a0a; padding: 15px 25px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; align-items: center; z-index: 99; box-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .content-body { padding: 24px; flex-grow: 1; }
+    </style>
+</head>
+<body>
+
+<div th:fragment="sidebar(activeMenu)" class="sidebar">
+    <div class="sidebar-header">
+        <h4 class="text-warning fw-bold mb-1" style="text-shadow: 0 0 10px rgba(255,193,7,0.4);"><i class="bi bi-camera-reels-fill me-2"></i>ADMIN PANEL</h4>
+        <small class="text-secondary" style="letter-spacing: 1px;">Smart Cinema System</small>
+    </div>
+    <ul class="sidebar-menu mt-2">
+        <li><a href="/admin/dashboard" th:classappend="${activeMenu == 'dashboard' ? 'active' : ''}">
+            <i class="bi bi-speedometer2 me-2 fs-5"></i> Tổng Quan
+        </a></li>
+
+        <li><a href="/admin/movies" th:classappend="${activeMenu == 'movies' ? 'active' : ''}">
+            <i class="bi bi-film me-2 fs-5"></i> Quản Lý Phim
+        </a></li>
+
+        <li><a href="/admin/showtimes/add" th:classappend="${activeMenu == 'showtimes' ? 'active' : ''}">
+            <i class="bi bi-calendar-range me-2 fs-5"></i> Xếp Lịch Chiếu
+        </a></li>
+
+        <li><a href="/admin/bookings" th:classappend="${activeMenu == 'bookings' ? 'active' : ''}">
+            <i class="bi bi-receipt me-2 fs-5"></i> Quản Lý Hóa Đơn
+        </a></li>
+    </ul>
+
+    <div class="p-3 text-center border-top" style="border-color: #222 !important;">
+        <a href="/" class="btn btn-outline-danger btn-sm w-100 fw-bold transition-all" style="letter-spacing: 1px;">
+            <i class="bi bi-house-door me-1"></i> Trở Về Website
+        </a>
+    </div>
+</div>
+
+
+<div th:fragment="topbar" class="top-navbar">
+    <h5 class="mb-0 text-white fw-bold" style="letter-spacing: 1px;" th:text="${pageTitle != null ? pageTitle : 'TỔNG QUAN HỆ THỐNG'}"></h5>
+
+    <div class="dropdown">
+        <button class="btn btn-dark dropdown-toggle border border-secondary" type="button" data-bs-toggle="dropdown" style="background-color: #111;">
+            <i class="bi bi-person-circle text-warning me-1"></i> Admin:
+            <span class="fw-bold text-white" th:text="${session.loggedInUser != null ? session.loggedInUser.fullName : 'Admin'}"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow-lg border border-secondary mt-2">
+            <li><a class="dropdown-item text-danger fw-bold py-2" href="/logout"><i class="bi bi-box-arrow-right me-2"></i> Đăng Xuất</a></li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

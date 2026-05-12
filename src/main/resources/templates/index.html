@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Chủ - Smart Cinema</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Cuộn trang mượt mà */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* PHONG CÁCH DARK CINEMATIC */
+        body {
+            background-color: #111; /* Đen tuyền cho nền */
+            color: #fff; /* Chữ trắng */
+        }
+
+        /* Cấu hình Navbar đen hoàn toàn */
+        .navbar-dark .navbar-nav .nav-link {
+            color: #adb5bd; /* Xám nhạt cho chữ menu */
+        }
+        .navbar-dark .navbar-nav .nav-link.active,
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #fff; /* Trắng khi hover/active */
+        }
+
+        /* Banner rạp chiếu phim với hiệu ứng tối đậm */
+        .hero-banner {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+                        url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070') center/cover;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        /* Cấu hình Thẻ Phim màu tối */
+        .card {
+            background-color: #212529; /* Xám đậm cho thẻ */
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Bay nhẹ lên khi hover */
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3); /* Bóng đổ màu đỏ nhạt CGV */
+        }
+
+        .card-img-top {
+            height: 350px;
+            object-fit: cover;
+        }
+        .card-title {
+            color: #fff; /* Tên phim chữ trắng */
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-black sticky-top shadow-lg">
+    <div class="container">
+        <a class="navbar-brand text-warning fw-bold d-flex align-items-center gap-2 fs-4" href="/">
+            <i class="bi bi-film"></i> SMART CINEMA
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto fw-medium fs-6">
+                <li class="nav-item"><a class="nav-link active" href="/"><i class="bi bi-house-door me-1"></i> Trang Chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#now-showing"><i class="bi bi-calendar3 me-1"></i> Lịch Chiếu</a></li>
+                <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#priceModal"><i class="bi bi-tags me-1"></i> Giá Vé</a></li>
+            </ul>
+
+            <ul class="navbar-nav align-items-center gap-1">
+                <th:block th:if="${session.loggedInUser == null}">
+                    <li class="nav-item"><a class="nav-link text-light opacity-75" href="/login"><i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập</a></li>
+                    <li class="nav-item"><a class="btn btn-danger btn-sm fw-bold px-3" href="/register"><i class="bi bi-person-plus-fill me-1"></i> Đăng Ký</a></li>
+                </th:block>
+
+                <th:block th:if="${session.loggedInUser != null}">
+
+                    <li class="nav-item" th:if="${session.loggedInUser.role == 'ROLE_ADMIN'}">
+                        <a class="nav-link text-warning fw-bold me-2 border border-warning rounded-pill btn-sm px-3" href="/admin/dashboard">
+                            <i class="bi bi-speedometer2 me-1"></i> Quản Trị
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white fw-bold d-flex align-items-center gap-2 border border-secondary rounded-pill px-3" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle fs-5 text-warning"></i>
+                            <span th:text="${session.loggedInUser.fullName}"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow border-0 mt-2 p-2">
+                            <li><a th:href="@{/booking/history}" class="dropdown-item fw-bold text-light px-3 py-2"><i class="bi bi-clock-history me-2 text-warning"></i> Lịch sử đặt vé</a></li>
+                            <li><a class="dropdown-item text-light opacity-75 px-3 py-2 small" href="/profile"><i class="bi bi-person-lines-fill me-2"></i> Cập nhật hồ sơ</a></li>
+                            <li><hr class="dropdown-divider border-secondary"></li>
+                            <li><a class="dropdown-item text-danger fw-bold px-3 py-2" href="/logout"><i class="bi bi-box-arrow-right me-2"></i> Đăng Xuất</a></li>
+                        </ul>
+                    </li>
+                </th:block>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="hero-banner mb-5 border-bottom border-danger border-2">
+    <div class="container py-4">
+        <h1 class="display-3 fw-bold text-warning mb-3" style="letter-spacing: -2px;">Trải Nghiệm Điện Ảnh Đỉnh Cao</h1>
+        <p class="lead fs-4 text-lightopacity-75">Đặt vé nhanh chóng - Chỗ ngồi cực êm - Hình ảnh siêu mượt</p>
+    </div>
+</div>
+
+<div id="now-showing" class="container mb-5 flex-grow-1">
+    <h3 class="border-start border-danger border-5 ps-3 mb-4 fw-bold text-uppercase d-flex align-items-center gap-2 text-white">
+        <i class="bi bi-fire text-danger"></i> Phim Đang Hot
+    </h3>
+
+    <div class="row g-4">
+        <div class="col-6 col-md-4 col-lg-3" th:each="movie : ${movies}">
+            <div class="card h-100 shadow-lg">
+                <img th:src="${movie.posterUrl != null and movie.posterUrl != '' ? movie.posterUrl : 'https://via.placeholder.com/300x450?text=No+Poster'}"
+                     class="card-img-top" alt="Poster">
+                <div class="card-body d-flex flex-column p-3">
+                    <h5 class="card-title fw-bold text-truncate mb-2" th:text="${movie.title}" th:title="${movie.title}">Tên Phim</h5>
+                    <p class="card-text small mb-3 text-lightopacity-75">
+                        <i class="bi bi-stopwatch text-warning me-1"></i> Thời lượng: <span class="fw-bold" th:text="${movie.duration}">0</span> phút
+                    </p>
+                    <div class="mt-auto">
+                        <a th:href="@{/booking/movie/{id}/showtimes(id=${movie.id})}" class="btn btn-danger btn-sm fw-bold w-100 text-uppercase" style="letter-spacing: 1px;">
+                            <i class="bi bi-ticket-perforated-fill me-1"></i> MUA VÉ NGAY
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(movies)}" class="col-12 text-center py-5">
+            <i class="bi bi-film text-danger" style="font-size: 5rem; opacity: 0.5;"></i>
+            <h5 class="text-secondary mt-3">Hệ thống đang cập nhật phim mới. Vui lòng quay lại sau!</h5>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="priceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-light border-warning border-2">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title fw-bold text-warning"><i class="bi bi-tags-fill me-2"></i>Bảng Giá Vé Smart Cinema</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <table class="table table-dark table-borderless align-middle mb-0">
+                    <tbody>
+                    <tr class="border-bottom border-secondary">
+                        <td class="fs-5"><i class="bi bi-file-person me-2 text-info"></i>Ghế Thường (Standard)</td>
+                        <td class="text-end fw-bold text-success fs-5">85,000 VNĐ</td>
+                    </tr>
+                    <tr>
+                        <td class="fs-5 pt-3"><i class="bi bi-star-fill me-2 text-warning"></i>Ghế VIP</td>
+                        <td class="text-end fw-bold text-success fs-5 pt-3">120,000 VNĐ</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="mt-4 p-3 bg-black rounded border border-danger border-opacity-50">
+                    <p class="text-muted small mb-0"><i class="bi bi-info-circle me-1 text-danger"></i> Giá vé áp dụng cho tất cả các ngày trong tuần, bao gồm cả Lễ/Tết. Giá vé này đã đồng bộ với hệ thống thanh toán tự động.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-black text-light py-4 text-center mt-auto border-top border-danger border-3 shadow-lg">
+    <div class="container">
+        <div class="mb-2">
+            <i class="bi bi-facebook fs-5 mx-2 text-secondary cursor-pointer hover:text-danger"></i>
+            <i class="bi bi-youtube fs-5 mx-2 text-secondary cursor-pointer hover:text-danger"></i>
+            <i class="bi bi-instagram fs-5 mx-2 text-secondary cursor-pointer hover:text-danger"></i>
+        </div>
+        <p class="mb-0 text-secondary small">© 2026 Smart Cinema - Đồ án Java Web - Sinh viên: Đoàn Việt Anh</p>
+    </div>
+</footer>
+
+<style>
+    /* CSS hack để chỉnh lại màu dropdown menu dark của bootstrap */
+    .dropdown-menu-dark .dropdown-item:hover {
+        background-color: #dc3545; /* Đổi màu hover dropdown thành màu đỏ */
+    }
+    .text-lightopacity-75 {
+        color: #adb5bd;
+    }
+    .hover:text-danger:hover {
+        color: #dc3545 !important;
+        transition: 0.2s;
+    }
+</style>
+
+</body>
+</html>

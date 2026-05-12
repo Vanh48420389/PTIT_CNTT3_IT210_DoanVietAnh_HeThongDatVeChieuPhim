@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chọn Suất Chiếu - Smart Cinema</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        /* ĐỒNG BỘ DARK CINEMATIC */
+        body {
+            background-color: #050505;
+            color: #eaeaea;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Thẻ Suất Chiếu Neon */
+        .neon-card {
+            background-color: #111;
+            border: 1px solid #222;
+            border-left: 5px solid #ffc107; /* Vạch vàng nhấn bên trái */
+            border-radius: 8px; /* Vuông vắn mạnh mẽ */
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .neon-card:hover {
+            transform: translateY(-3px);
+            border-color: #e50914;
+            border-left-color: #e50914;
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.3), inset 0 0 10px rgba(229, 9, 20, 0.05);
+        }
+
+        /* Nút Giờ Chiếu (Đang bán) */
+        .time-badge-neon {
+            background-color: transparent;
+            color: #e50914;
+            border: 2px solid #e50914;
+            padding: 10px 25px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 800;
+            display: inline-block;
+            transition: 0.3s;
+            letter-spacing: 1px;
+        }
+        .time-badge-neon:hover {
+            background-color: #e50914;
+            color: white;
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* Nút Giờ Chiếu (Hết vé) */
+        .time-badge-soldout {
+            background-color: #1a1a1a;
+            color: #555;
+            border: 2px dashed #444;
+            padding: 10px 25px;
+            border-radius: 6px;
+            font-weight: 800;
+            display: inline-block;
+            cursor: not-allowed;
+            letter-spacing: 1px;
+        }
+
+        /* Chữ phát sáng */
+        .glow-text-gold {
+            text-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+        }
+
+        /* Hiệu ứng mượt cho Poster */
+        .poster-glow {
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px rgba(229, 9, 20, 0.2);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <a th:href="@{/}" class="btn btn-outline-light mb-5 fw-bold transition-all px-4" style="border-radius: 6px;">
+        <i class="bi bi-arrow-left me-2"></i> Trở về Trang Chủ
+    </a>
+
+    <div class="row align-items-start gap-4 gap-md-0">
+        <div class="col-md-4 text-center mb-4">
+            <img th:src="${movie.posterUrl}" class="img-fluid poster-glow w-100" style="max-height: 500px; object-fit: cover;" alt="Poster Phim">
+        </div>
+
+        <div class="col-md-8 ps-md-4">
+            <h1 class="fw-bold text-warning text-uppercase mb-3 glow-text-gold" th:text="${movie.title}" style="letter-spacing: 1px;">Tên Phim</h1>
+
+            <p class="text-light opacity-75 fs-6 lh-lg text-justify mb-4" th:text="${movie.description}"></p>
+
+            <div class="d-flex align-items-center gap-3 text-secondary small mb-4">
+                <span><i class="bi bi-stopwatch text-warning me-1"></i> Thời lượng: <strong class="text-white" th:text="${movie.duration} + ' phút'"></strong></span>
+                <span>|</span>
+                <span><i class="bi bi-calendar3 text-warning me-1"></i> Ngày chiếu: <strong class="text-white" th:text="${#temporals.format(movie.releaseDate, 'dd/MM/yyyy')}"></strong></span>
+            </div>
+
+            <hr class="border-secondary opacity-50 my-4">
+
+            <h4 class="mb-4 fw-bold text-white d-flex align-items-center gap-2">
+                <i class="bi bi-ticket-perforated-fill text-danger fs-3"></i> CHỌN SUẤT CHIẾU
+            </h4>
+
+            <div th:if="${#lists.isEmpty(showtimes)}" class="text-center py-5 bg-black border border-secondary rounded-3" style="box-shadow: inset 0 0 20px rgba(0,0,0,0.8);">
+                <i class="bi bi-emoji-frown text-secondary" style="font-size: 3rem; opacity: 0.5;"></i>
+                <h5 class="text-muted fw-bold mt-3">Chưa có suất chiếu</h5>
+                <p class="text-secondary small mb-0">Phim này hiện chưa xếp lịch hoặc đã quá giờ chiếu. Vui lòng quay lại sau!</p>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12" th:each="st : ${showtimes}">
+                    <div class="neon-card p-3 p-md-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+
+                        <div>
+                            <h5 class="mb-2 text-info fw-bold text-uppercase d-flex align-items-center gap-2" style="letter-spacing: 1px;">
+                                <i class="bi bi-door-open-fill text-warning"></i>
+                                <span th:text="${st.room.name}">Tên Phòng</span>
+                            </h5>
+                            <p class="mb-0 small text-light opacity-75 d-flex align-items-center gap-2">
+                                <i class="bi bi-calendar-event"></i>
+                                Ngày chiếu: <span class="fw-bold text-white fs-6" th:text="${#temporals.format(st.startTime, 'dd/MM/yyyy')}"></span>
+                            </p>
+                        </div>
+
+                        <div class="text-md-end text-start mt-3 mt-md-0 border-top border-secondary border-opacity-50 pt-3 pt-md-0 border-md-none">
+
+                            <div th:if="${soldOutMap.get(st.id)}">
+                                <div class="time-badge-soldout fs-5">
+                                    <i class="bi bi-lock-fill me-1"></i>
+                                    <span th:text="${#temporals.format(st.startTime, 'HH:mm')}"></span>
+                                </div>
+                                <div class="small text-secondary mt-2 fw-bold text-uppercase"><i class="bi bi-x-circle me-1"></i> Hết vé</div>
+                            </div>
+
+                            <div th:unless="${soldOutMap.get(st.id)}">
+                                <a th:href="@{/booking/{id}(id=${st.id})}" class="time-badge-neon fs-5 text-decoration-none">
+                                    <span th:text="${#temporals.format(st.startTime, 'HH:mm')}"></span>
+                                </a>
+                                <div class="small text-success mt-2 fw-bold text-uppercase" style="text-shadow: 0 0 5px rgba(25,135,84,0.5);">
+                                    <i class="bi bi-check-circle me-1"></i> Đang bán vé
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
