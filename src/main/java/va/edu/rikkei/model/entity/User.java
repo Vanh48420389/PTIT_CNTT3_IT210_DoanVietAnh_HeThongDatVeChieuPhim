@@ -1,10 +1,8 @@
 package va.edu.rikkei.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -24,9 +22,10 @@ public class User {
     @Column(nullable = false)
     private String fullName;
 
-    // Ràng buộc định dạng Email
+    // Ràng buộc định dạng Email bằng Regex
     @NotBlank(message = "Email không được để trống")
-    @Email(message = "Email không đúng định dạng (VD: abc@gmail.com)")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$",
+            message = "Email không đúng định dạng (VD: abc@gmail.com)")
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -35,8 +34,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    // Ràng buộc định dạng Số điện thoại Việt Nam (10 số, bắt đầu bằng 0 hoặc +84)
+    // Ràng buộc định dạng Số điện thoại Việt Nam bằng Regex (10 số, bắt đầu bằng 0 hoặc +84)
     @NotBlank(message = "Số điện thoại không được để trống")
+    @Pattern(regexp = "^(0|\\+84)[0-9]{9}$",
+            message = "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0 hoặc +84")
+    @Column(nullable = false) // Nên thêm nullable = false nếu db bắt buộc có sđt
     private String phone;
 
     private String role; // ROLE_USER hoặc ROLE_ADMIN

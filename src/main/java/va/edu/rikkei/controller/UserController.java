@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import va.edu.rikkei.model.entity.User;
 import va.edu.rikkei.service.UserService;
 
@@ -27,7 +28,7 @@ public class UserController {
     public String processRegister(@Valid @ModelAttribute("user") User user,
                                   BindingResult bindingResult,
                                   Model model) {
-        // 1. Kiểm tra Validate (để trống, sai định dạng email/sđt, pass quá ngắn...)
+        // 1. Kiểm tra Validate (để trống, sai định dạng email/sđt bằng Regex, pass quá ngắn...)
         if (bindingResult.hasErrors()) {
             return "register"; // Có lỗi -> Trả lại form để hiện chữ đỏ
         }
@@ -89,7 +90,7 @@ public class UserController {
     public String showProfile(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
-            return "redirect:/login"; // Bắt buộc đăng nhập
+            return "redirect:/login";
         }
 
         // Đẩy thông tin lên form
@@ -98,18 +99,33 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    public String processUpdateProfile(@ModelAttribute("user") User updatedUser, HttpSession session) {
+    public String processUpdateProfile(@ModelAttribute("user") User updatedUser,
+                                       HttpSession session,
+                                       RedirectAttributes redirectAttributes) {
+
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser != null) {
-            // Gắn lại ID cũ vào object gửi lên để update đúng người
-            updatedUser.setId(loggedInUser.getId());
 
-            // Lưu cập nhật vào DB
-            User savedUser = userService.updateUser(updatedUser);
+            // 1. VALIDATE THỦ CÔNG: Bắt lỗi nếu nhập bậy bạ ở form Profile
+            if (updatedUser.getFullName() == null || updatedUser.getFullName().trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("errorMsg", "Lỗi: Họ và tên không được để trống");
+                return "redirect:/profile";
+            }
 
-            // Cập nhật thông tin mới vào ngay Session để đổi tên trên thanh Menu
+            if (updatedUser.getPhone() == null || !updatedUser.getPhone().matches("^(0|\\+84)[0-9]{9}$")) {
+                redirectAttributes.addFlashAttribute("errorMsg", "Lỗi: Số điện thoại phải gồm 10 chữ số hợp lệ");
+                return "redirect:/profile";
+            }
+
+            // 2. Nếu dữ liệu hợp lệ
+            updatedUser.setId(loggedInUser.getId()); // Gắn lại ID cũ vào object gửi lên để update đúng người
+            User savedUser = userService.updateUser(updatedUser); // Lưu cập nhật vào DB
+
+            // 3. Cập nhật thông tin mới vào ngay Session để đổi tên trên thanh Menu
             session.setAttribute("loggedInUser", savedUser);
+
+            redirectAttributes.addFlashAttribute("successMsg", "Cập nhật hồ sơ thành công!");
         }
-        return "redirect:/profile?success=true";
+        return "redirect:/profile";
     }
 }

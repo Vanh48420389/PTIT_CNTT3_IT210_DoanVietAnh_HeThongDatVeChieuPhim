@@ -75,6 +75,28 @@
             color: #ffc107;
             background: rgba(255, 193, 7, 0.1);
         }
+
+        /* CSS CHO THANH PHÂN TRANG DARK MODE */
+        .pagination-dark .page-link {
+            background-color: #1a1a1a;
+            border-color: #333;
+            color: #adb5bd;
+        }
+        .pagination-dark .page-item.active .page-link {
+            background-color: #e50914;
+            border-color: #e50914;
+            color: white;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+        }
+        .pagination-dark .page-link:hover {
+            background-color: #333;
+            color: white;
+        }
+        .pagination-dark .page-item.disabled .page-link {
+            background-color: #0f0f0f;
+            color: #555;
+            border-color: #222;
+        }
     </style>
 </head>
 <body>
@@ -110,7 +132,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="b : ${bookings}" th:style="${b.status == 'CANCELLED'} ? 'opacity: 0.5; background-color: #0a0a0a;' : ''">
+                        <tr th:each="b : ${bookingPage.content}" th:style="${b.status == 'CANCELLED'} ? 'opacity: 0.5; background-color: #0a0a0a;' : ''">
                             <td class="fw-bold text-secondary" th:text="'#' + ${b.id}"></td>
                             <td>
                                 <div class="fw-bold text-white" th:text="${b.user.fullName}">Tên</div>
@@ -138,7 +160,7 @@
                                 <i th:if="${b.status == 'CANCELLED'}" class="bi bi-lock-fill text-secondary fs-5"></i>
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(bookings)}">
+                        <tr th:if="${bookingPage.empty}">
                             <td colspan="8" class="text-center py-5 text-muted fw-bold">
                                 <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                 Chưa có dữ liệu vé trên hệ thống.
@@ -148,6 +170,24 @@
                     </table>
                 </div>
             </div>
+
+            <div class="card-footer bg-transparent border-top border-dark py-3" th:if="${bookingPage.totalPages > 1}">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-dark justify-content-center mb-0">
+                        <li class="page-item" th:classappend="${bookingPage.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/bookings(page=${bookingPage.number - 1})}">Trước</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, bookingPage.totalPages - 1)}"
+                            th:classappend="${bookingPage.number == i} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/bookings(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${bookingPage.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/bookings(page=${bookingPage.number + 1})}">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
         </div>
     </div>
 </div>

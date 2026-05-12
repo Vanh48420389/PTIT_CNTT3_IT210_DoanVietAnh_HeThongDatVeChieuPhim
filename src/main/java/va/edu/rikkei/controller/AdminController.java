@@ -2,14 +2,20 @@ package va.edu.rikkei.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import va.edu.rikkei.model.entity.Booking;
+import va.edu.rikkei.model.entity.Showtime;
 import va.edu.rikkei.model.entity.User;
 import va.edu.rikkei.repository.BookingRepository;
 import va.edu.rikkei.repository.MovieRepository;
@@ -28,8 +34,6 @@ public class AdminController {
     private final BookingRepository bookingRepository;
     private final MovieRepository movieRepository;
     private final BookingService bookingService;
-
-    // Đã mở comment RoomRepository và thêm ShowtimeRepository
     private final RoomRepository roomRepository;
     private final ShowtimeRepository showtimeRepository;
 
@@ -44,7 +48,7 @@ public class AdminController {
         }
 
         long totalMovies = movieRepository.count();
-        long totalRooms = roomRepository.count(); // Đã dùng DB thật thay vì số cứng
+        long totalRooms = roomRepository.count();
         long totalTickets = bookingRepository.countByStatus("PAID");
 
         List<Object[]> revenueData = bookingRepository.getRevenueByMovie();
@@ -70,21 +74,25 @@ public class AdminController {
     }
 
     // ==========================================
-    // QUẢN LÝ SUẤT CHIẾU (SHOWTIMES)
+    // QUẢN LÝ SUẤT CHIẾU (SHOWTIMES) - ĐÃ CÓ PHÂN TRANG
     // ==========================================
     @GetMapping("/showtimes/add")
-    public String showAddShowtimeForm(HttpSession session, Model model) {
+    public String showAddShowtimeForm(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size, // Hiển thị 5 suất chiếu 1 trang
+            HttpSession session, Model model) {
+
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null || !loggedInUser.getRole().equals("ROLE_ADMIN")) return "redirect:/";
 
-        // Đổ dữ liệu vào Form thêm mới
         model.addAttribute("movies", movieRepository.findAll());
         model.addAttribute("rooms", roomRepository.findAll());
 
-        // Lấy danh sách lịch chiếu (sắp xếp giảm dần theo thời gian bắt đầu) để truyền xuống Bảng
-        model.addAttribute("allShowtimes", showtimeRepository.findAll(
-                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "startTime")
-        ));
+        // Lấy danh sách lịch chiếu theo Phân trang
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "startTime"));
+        Page<Showtime> showtimePage = showtimeRepository.findAll(pageable);
+
+        model.addAttribute("showtimePage", showtimePage);
 
         return "add-showtime";
     }
@@ -98,27 +106,30 @@ public class AdminController {
             showtimeRepository.deleteById(id);
             redirectAttributes.addFlashAttribute("successMsg", "Đã xóa suất chiếu thành công!");
         } catch (Exception e) {
-            // Bắt lỗi khóa ngoại nếu suất chiếu đã có vé được đặt
             redirectAttributes.addFlashAttribute("errorMsg", "Không thể xóa! Suất chiếu này đã có khách hàng đặt vé.");
         }
         return "redirect:/admin/showtimes/add";
     }
 
     // ==========================================
-    // QUẢN LÝ HÓA ĐƠN (BOOKINGS)
+    // QUẢN LÝ HÓA ĐƠN (BOOKINGS) - ĐÃ CÓ PHÂN TRANG
     // ==========================================
     @GetMapping("/bookings")
-    public String manageBookings(HttpSession session, Model model) {
+    public String manageBookings(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            HttpSession session, Model model) {
+
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null || !loggedInUser.getRole().equals("ROLE_ADMIN")) {
             return "redirect:/";
         }
 
-        List<Booking> bookings = bookingRepository.findAll(
-                org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "bookingDate")
-        );
+        // Lấy danh sách vé theo Phân trang
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "bookingDate"));
+        Page<Booking> bookingPage = bookingRepository.findAll(pageable);
 
-        model.addAttribute("bookings", bookings);
+        model.addAttribute("bookingPage", bookingPage);
         return "admin-bookings";
     }
 
