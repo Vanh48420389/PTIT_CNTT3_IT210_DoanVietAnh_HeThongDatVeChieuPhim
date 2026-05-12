@@ -28,9 +28,8 @@ public class MovieController {
     @GetMapping("/")
     public String homePage(Model model) {
         // Dùng PageRequest để lấy đúng trang đầu tiên (số 0) và cắt đúng 8 bộ phim
-        Pageable top8 = PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable top8 = PageRequest.of(0, 8, Sort.by(Sort.Direction.DESC, "id"));
 
-        // Truyền content (List) xuống để HTML cũ của bro vẫn chạy được bình thường mà không cần sửa gì
         model.addAttribute("movies", movieRepository.findAll(top8).getContent());
 
         return "index";
