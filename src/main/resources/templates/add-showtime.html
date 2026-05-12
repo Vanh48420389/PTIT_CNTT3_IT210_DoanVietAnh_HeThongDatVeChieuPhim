@@ -85,7 +85,7 @@
                             <label class="form-label fw-bold"><i class="bi bi-film text-warning me-1"></i> Chọn Phim (*)</label>
                             <select name="movieId" class="form-select dark-input" required>
                                 <option value="">-- Click để chọn phim --</option>
-                                <option th:each="m : ${movies}" th:value="${m.id}" th:text="${m.title} + ' (⏳ ' + ${m.duration} + ' p)'"></option>
+                                <option th:each="m : ${movies}" th:value="${m.id}" th:text="${m.title} + ' ( ' + ${m.duration} + ' p)'"></option>
                             </select>
                         </div>
 
@@ -93,7 +93,7 @@
                             <label class="form-label fw-bold"><i class="bi bi-door-open text-warning me-1"></i> Chọn Phòng Chiếu (*)</label>
                             <select name="roomId" class="form-select dark-input" required>
                                 <option value="">-- Click để chọn phòng --</option>
-                                <option th:each="r : ${rooms}" th:value="${r.id}" th:text="'🍿 ' + ${r.name}"></option>
+                                <option th:each="r : ${rooms}" th:value="${r.id}" th:text="' ' + ${r.name}"></option>
                             </select>
                         </div>
 
@@ -135,9 +135,6 @@
                             <td class="text-white" th:text="${st.room.name}">Tên phòng</td>
                             <td class="text-warning fw-bold" th:text="${#temporals.format(st.startTime, 'HH:mm - dd/MM/yyyy')}">Thời gian</td>
                             <td>
-                                <a th:href="@{/admin/showtimes/edit/{id}(id=${st.id})}" class="btn btn-sm btn-neon-edit fw-bold px-3 me-2">
-                                    <i class="bi bi-pencil-square"></i> Sửa
-                                </a>
                                 <a href="#" th:onclick="'confirmDelete(event, \'/admin/showtimes/delete/' + ${st.id} + '\')'" class="btn btn-sm btn-neon-delete fw-bold px-3">
                                     <i class="bi bi-trash"></i> Xóa
                                 </a>

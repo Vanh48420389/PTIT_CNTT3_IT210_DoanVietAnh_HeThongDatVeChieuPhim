@@ -86,7 +86,7 @@ public class AdminController {
                 org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "startTime")
         ));
 
-        return "admin-showtimes";
+        return "add-showtime";
     }
 
     @GetMapping("/showtimes/delete/{id}")
