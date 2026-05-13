@@ -31,8 +31,6 @@ public class BookingController {
     private final BookingRepository bookingRepository;
     private final BookingService bookingService;
     private final MovieRepository movieRepository;
-
-    // TIÊM EMAIL SERVICE VÀO ĐỂ SỬ DỤNG
     private final EmailService emailService;
 
     // 1. HIỂN THỊ SƠ ĐỒ GHẾ CỦA SUẤT CHIẾU
@@ -87,7 +85,7 @@ public class BookingController {
             // ==========================================
             emailService.sendTicketEmail(newBooking);
 
-            redirectAttributes.addFlashAttribute("successMsg", "🎉 Đặt vé thành công! Mã QR đã được gửi vào Email của bạn.");
+            redirectAttributes.addFlashAttribute("successMsg", " Đặt vé thành công Mã QR đã được gửi vào Email của bạn.");
             return "redirect:/booking/" + showtimeId;
 
         } catch (Exception e) {

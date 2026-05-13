@@ -74,7 +74,7 @@ public class AdminController {
     }
 
     // ==========================================
-    // QUẢN LÝ SUẤT CHIẾU (SHOWTIMES) - ĐÃ CÓ PHÂN TRANG
+    // QUẢN LÝ SUẤT CHIẾU (SHOWTIMES)
     // ==========================================
     @GetMapping("/showtimes/add")
     public String showAddShowtimeForm(
@@ -112,7 +112,7 @@ public class AdminController {
     }
 
     // ==========================================
-    // QUẢN LÝ HÓA ĐƠN (BOOKINGS) - ĐÃ CÓ PHÂN TRANG
+    // QUẢN LÝ HÓA ĐƠN (BOOKINGS)
     // ==========================================
     @GetMapping("/bookings")
     public String manageBookings(

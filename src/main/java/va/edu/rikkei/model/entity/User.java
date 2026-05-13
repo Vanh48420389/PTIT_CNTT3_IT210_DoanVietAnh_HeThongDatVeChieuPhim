@@ -36,8 +36,8 @@ public class User {
 
     // Ràng buộc định dạng Số điện thoại Việt Nam bằng Regex (10 số, bắt đầu bằng 0 hoặc +84)
     @NotBlank(message = "Số điện thoại không được để trống")
-    @Pattern(regexp = "^(0|\\+84)[0-9]{9}$",
-            message = "Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0 hoặc +84")
+    @Pattern(regexp = "^[0-9]{10}$",
+            message = "Số điện thoại phải gồm 10 chữ số ")
     @Column(nullable = false) // Nên thêm nullable = false nếu db bắt buộc có sđt
     private String phone;
 
